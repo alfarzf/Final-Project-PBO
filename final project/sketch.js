@@ -5,11 +5,19 @@ let score = 0;
 let runGame = 1;
 let win = 0;
 let lose = 0;
+var heroImage;
+var monsterImage;
+var bulletImage;
+var bulletSound;
+var destroySound;
+
 function setup() {
   
   createCanvas(400, 400);
   level = new Level(c);
-  monster = new Monster(25,25,0,0,level);
+  monster = new Monster(0,0,0,0,level);
+  monsterImage.resize(30, 30);
+  imageMode(CENTER);
   
 }
 
@@ -18,8 +26,9 @@ function draw() {
   if (runGame){
     
     background(51);
-    hero = new Hero(25, 25, mouseX, height-50, level);
+    hero = new Hero(0, 0, mouseX, height-50, level);
     hero.render();
+    heroImage.resize(30, 30);
     monster.render();
     
     let textscore = 'score = '+score;
@@ -43,6 +52,7 @@ function draw() {
           // ...
           score += 1;
           console.log("killed!")
+          destroySound.play();
 
         }
         
@@ -76,7 +86,8 @@ function draw() {
       c += 1;
       level = new Level(c);
       bullets = []
-      monster = new Monster(25,25,0,0,level);
+      monster = new Monster(0,0,0,0,level);
+      monsterImage.resize(30, 30);
       // console.log(score);
 
     }
@@ -116,6 +127,7 @@ function mousePressed(){
   // console.log('clicked!');
   // console.log(hero.getEntityPositionX());
   hero.attack();
+  bulletSound.play();
   
 }
 
@@ -178,12 +190,13 @@ class Hero extends Entity{
   render(){
     
     //render hero
-    circle(this.x, this.y, this.width);
+    image(heroImage, this.x, this.y, this.width);
     
     //render bullet
     for (let bullet of bullets){
       
-      circle(bullet.x, bullet.y, 10);
+      image(bulletImage, bullet.x, bullet.y, 10);
+      bulletImage.resize(30, 30);
       
       if (this.level.getCurrentLevel() == 1){
         
@@ -258,12 +271,20 @@ class Monster extends Entity{
     for (let monster of monsters){
         
         monster.y +=this.speed;
-        rect(monster.x, monster.y, this.width);
+        image(monsterImage, monster.x, monster.y, this.width);
 
     }
     
   }
   
 
+}
+
+function preload(){
+  heroImage = loadImage('hero.png');
+  monsterImage = loadImage('monster.png');
+  bulletImage = loadImage('bullet.png');
+  bulletSound = loadSound('Bsound.ogg');
+  destroySound = loadSound('Dsound.ogg');
 }
 
