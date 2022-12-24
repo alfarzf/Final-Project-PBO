@@ -89,6 +89,7 @@ function draw() {
       c += 1;
       level = new Level(c);
       bullets = []
+      hero = new Hero(0, 0, 200, height-50, level);
       monster = new Monster(0,0,0,0,level);
       monsterImage.resize(30, 30);
       // console.log(score);
