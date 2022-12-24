@@ -10,11 +10,15 @@ var monsterImage;
 var bulletImage;
 var bulletSound;
 var destroySound;
+const spd=5;
+let pressedKeys={};
+
 
 function setup() {
-  
-  createCanvas(400, 400);
+  maps=new Maps(400,400)
+  createCanvas(maps.getWidth(), maps.getHeight());
   level = new Level(c);
+  hero = new Hero(0, 0, 200, height-50, level);
   monster = new Monster(0,0,0,0,level);
   monsterImage.resize(30, 30);
   imageMode(CENTER);
@@ -26,7 +30,7 @@ function draw() {
   if (runGame){
     
     background(51);
-    hero = new Hero(0, 0, mouseX, height-50, level);
+    // hero = new Hero(0, 0, 200, height-50, level);
     hero.render();
     heroImage.resize(30, 30);
     monster.render();
@@ -37,7 +41,6 @@ function draw() {
     fill('white')
     text(textscore, 10, 20);
     text(textlv, 10, 30);
-
     //collisions + score
     for (let monster of monsters){
 
@@ -131,6 +134,35 @@ function mousePressed(){
   
 }
 
+function keyPressed() {
+  pressedKeys[key]=true;
+}
+
+function keyReleased(){
+  delete pressedKeys[key];
+}
+class Maps{
+  constructor(width, height){
+    
+    this.width = width;
+    this.height = height;
+    
+  }
+  getWidth(){
+    
+    return this.width;
+    
+  }
+  getHeight(){
+    
+    return this.width
+    
+  }
+  move(){
+    
+  }
+}
+
 class Level{
   
   constructor(lv){  
@@ -139,6 +171,10 @@ class Level{
     this.latestLevel = 0;
     this.maxLevel = 3;
   
+  }
+  
+  setLevel(lv){
+    this.currentLevel = lv;
   }
   
   getCurrentLevel(){
@@ -164,6 +200,29 @@ class Entity{
     this.y = y;
     
   }
+  
+  moveRight(){
+    
+    this.x+=1;
+    
+  }
+  
+  moveLeft(){
+    
+    this.x-=1;
+    
+  }
+  
+  moveUp(){
+    
+    this.y-=1;
+  }
+  
+  moveDown(){
+    
+    this.y+=1;
+  }
+  
   getEntityPositionX(){
     
     return this.x;
@@ -176,10 +235,22 @@ class Entity{
     
   }
   
+  attack(){
+    
+    let bullet = {
+    
+      x : this.x,
+      y : this.y
+    
+    }
+    
+    bullets.push(bullet)
+    
+  }
+  
 }
 
 class Hero extends Entity{
-  
   constructor(width, height, x, y, level){
     
     super(width, height, x, y);
@@ -188,10 +259,28 @@ class Hero extends Entity{
   }
   
   render(){
-    
+    let move=createVector(0,0);
+    if(pressedKeys.a){
+      hero.moveLeft();
+      move.x-=1;
+    }
+    if(pressedKeys.d){
+      hero.moveRight();
+      move.x+=1;
+    }
+    if(pressedKeys.w){
+      hero.moveUp();
+      move.y-=1;
+    }
+    if(pressedKeys.s){
+      hero.moveDown();
+      move.y+=1;
+    }
+    move.setMag(spd);
+    this.x+=move.x;
+    this.y+=move.y;
     //render hero
     image(heroImage, this.x, this.y, this.width);
-    
     //render bullet
     for (let bullet of bullets){
       
@@ -214,19 +303,6 @@ class Hero extends Entity{
       }
       
     }
-    
-  }
-  
-  attack(){
-    
-    let bullet = {
-    
-      x : this.x,
-      y : this.y
-    
-    }
-    
-    bullets.push(bullet)
     
   }
   
@@ -277,7 +353,6 @@ class Monster extends Entity{
     
   }
   
-
 }
 
 function preload(){
@@ -287,4 +362,3 @@ function preload(){
   bulletSound = loadSound('Bsound.ogg');
   destroySound = loadSound('Dsound.ogg');
 }
-
